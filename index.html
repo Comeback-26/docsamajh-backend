@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocSamajh — Koi bhi document, seedhi baat</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:#0D0D0D; --paper:#F7F4EE; --saffron:#E8620A;
+  --saffron-light:#FFF0E6; --green:#1A6B3C; --green-light:#E8F5EE;
+  --muted:#6B6560; --border:#E0DBD4; --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);}
+nav{display:flex;justify-content:space-between;align-items:center;padding:1.25rem 2.5rem;border-bottom:1px solid var(--border);background:var(--paper);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;}
+.logo span{color:var(--saffron);}
+.nav-right{display:flex;gap:1rem;align-items:center;}
+.nav-credits{font-size:0.8rem;background:var(--saffron-light);color:var(--saffron);padding:3px 10px;border-radius:20px;font-weight:500;}
+.btn-primary{padding:0.5rem 1.25rem;background:var(--saffron);color:white;border:none;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:500;cursor:pointer;}
+.hero{max-width:780px;margin:0 auto;padding:5rem 2rem 3rem;text-align:center;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--saffron-light);border:1px solid #F4C9A8;color:var(--saffron);font-size:0.8rem;font-weight:500;padding:4px 14px;border-radius:20px;margin-bottom:1.75rem;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,6vw,3.8rem);font-weight:900;line-height:1.12;letter-spacing:-0.03em;margin-bottom:1.25rem;}
+.hero h1 em{font-style:normal;color:var(--saffron);}
+.hero p{font-size:1.1rem;color:var(--muted);line-height:1.7;max-width:560px;margin:0 auto 2.5rem;}
+.trust-strip{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;font-size:0.825rem;color:var(--muted);}
+.tool-section{max-width:860px;margin:0 auto;padding:3rem 2rem;}
+.tool-section h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;text-align:center;margin-bottom:0.5rem;}
+.section-sub{text-align:center;color:var(--muted);font-size:0.95rem;margin-bottom:2rem;}
+.lang-tabs{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.lang-tab{padding:6px 16px;border:1px solid var(--border);border-radius:20px;font-size:0.85rem;cursor:pointer;background:white;color:var(--ink);transition:all 0.15s;font-family:'DM Sans',sans-serif;}
+.lang-tab.active{background:var(--saffron);color:white;border-color:var(--saffron);}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem;}
+.upload-card{background:white;border:1.5px dashed var(--border);border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:all 0.2s;position:relative;}
+.upload-card:hover{border-color:var(--saffron);background:var(--saffron-light);}
+.upload-card.has-file{border-color:var(--green);background:var(--green-light);border-style:solid;}
+.upload-card input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-icon{font-size:2rem;margin-bottom:0.5rem;}
+.upload-card h3{font-size:0.95rem;font-weight:600;margin-bottom:0.25rem;}
+.upload-card p{font-size:0.8rem;color:var(--muted);}
+.or-divider{display:flex;align-items:center;gap:12px;margin-bottom:1rem;color:var(--muted);font-size:0.85rem;}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.paste-area{width:100%;min-height:120px;padding:1rem;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--ink);background:white;resize:vertical;outline:none;margin-bottom:1rem;}
+.paste-area:focus{border-color:var(--saffron);}
+.selector-group{margin-bottom:1.25rem;}
+.selector-group label{display:block;font-size:0.8rem;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;}
+.selector-group select{width:100%;padding:0.625rem 0.875rem;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;background:white;outline:none;cursor:pointer;}
+.analyze-btn{width:100%;padding:1rem;background:var(--saffron);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;margin-bottom:1rem;display:flex;align-items:center;justify-content:center;gap:8px;}
+.analyze-btn:disabled{background:#D4C4BA;cursor:not-allowed;}
+.error-msg{display:none;padding:12px 16px;background:#FEE2E2;border:1px solid #FCA5A5;border-radius:8px;font-size:0.875rem;color:#991B1B;margin-bottom:1rem;}
+.loading-state{display:none;text-align:center;padding:2rem;color:var(--muted);}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--saffron);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.result-card{display:none;background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 2px 20px rgba(13,13,13,0.08);animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.result-header{padding:1rem 1.5rem;background:var(--green-light);border-bottom:1px solid #C3DFD0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.result-header-left{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--green);font-size:0.95rem;}
+.doc-type-badge{font-size:0.75rem;padding:2px 10px;background:var(--green);color:white;border-radius:20px;font-weight:500;}
+.result-actions{display:flex;gap:8px;}
+.action-btn{padding:6px 14px;border-radius:6px;font-size:0.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:white;font-family:'DM Sans',sans-serif;}
+.action-btn.primary{background:var(--saffron);color:white;border-color:var(--saffron);}
+.result-body{padding:1.5rem;}
+.result-section{margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.result-section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.result-section h4{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:0.625rem;}
+.result-section p{font-size:0.95rem;line-height:1.7;color:var(--ink);}
+.action-steps{list-style:none;padding:0;}
+.action-steps li{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;padding:10px 12px;background:var(--paper);border-radius:8px;font-size:0.9rem;line-height:1.5;}
+.step-num{min-width:22px;height:22px;background:var(--saffron);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;margin-top:1px;}
+.urgency-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:6px;font-size:0.85rem;font-weight:500;}
+.urgency-high{background:#FEE2E2;color:#991B1B;}
+.urgency-medium{background:#FEF3C7;color:#92400E;}
+.urgency-low{background:var(--green-light);color:var(--green);}
+.reply-section{margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1.5rem;display:none;}
+.reply-section h4{font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin-bottom:0.75rem;}
+.reply-textarea{width:100%;min-height:200px;padding:1rem;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;background:var(--paper);resize:vertical;outline:none;line-height:1.7;}
+.reply-actions{display:flex;gap:8px;margin-top:0.75rem;}
+.preview-img{max-width:100%;max-height:250px;border-radius:10px;border:1px solid var(--border);display:block;margin:0 auto 0.75rem;}
+/* Camera modal */
+.camera-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:300;flex-direction:column;align-items:center;justify-content:center;}
+.camera-modal.open{display:flex;}
+/* Pricing */
+.pricing-section{background:white;border-top:1px solid var(--border);padding:4rem 2rem;}
+.pricing-inner{max-width:780px;margin:0 auto;text-align:center;}
+.pricing-inner h2{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;margin-bottom:0.5rem;}
+.pricing-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:2.5rem;}
+.pricing-card{border:1px solid var(--border);border-radius:12px;padding:1.75rem 1.5rem;text-align:left;position:relative;background:var(--paper);}
+.pricing-card.popular{border-color:var(--saffron);background:white;box-shadow:0 8px 48px rgba(13,13,13,0.14);}
+.popular-tag{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--saffron);color:white;font-size:0.72rem;font-weight:600;padding:3px 12px;border-radius:20px;white-space:nowrap;}
+.plan-features2{list-style:none;margin-bottom:1.5rem;}
+.plan-features2 li{font-size:0.875rem;padding:5px 0;display:flex;align-items:center;gap:7px;}
+.plan-features2 li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
+.plan-btn2{width:100%;padding:0.75rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;}
+.plan-btn2.filled{background:var(--saffron);color:white;border-color:var(--saffron);}
+.footer-note{font-size:0.78rem;color:var(--muted);text-align:center;padding:1rem 2.5rem;line-height:1.6;}
+footer{border-top:1px solid var(--border);padding:1.5rem 2.5rem;display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:var(--muted);}
+@media(max-width:640px){
+  nav{padding:1rem;} .hero{padding:3rem 1rem 2rem;} .tool-section{padding:2rem 1rem;}
+  .upload-grid{grid-template-columns:1fr;} .pricing-cards{grid-template-columns:1fr;} footer{flex-direction:column;gap:8px;}
+}
+</style>
+</head>
+<body>
+
+<!-- CAMERA MODAL -->
+<div class="camera-modal" id="cameraModal">
+  <div style="width:100%;max-width:500px;padding:1rem;">
+    <video id="cameraFeed" autoplay playsinline style="width:100%;border-radius:12px;background:#000;max-height:60vh;object-fit:cover;"></video>
+    <canvas id="cameraCanvas" style="display:none;"></canvas>
+    <div style="display:flex;gap:12px;margin-top:1rem;justify-content:center;">
+      <button id="captureBtn" style="padding:1rem 2rem;background:#E8620A;color:white;border:none;border-radius:8px;font-size:1rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">📸 Photo Lo</button>
+      <button id="closeCameraBtn" style="padding:1rem 2rem;background:white;color:#0D0D0D;border:none;border-radius:8px;font-size:1rem;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancel</button>
+    </div>
+    <p style="color:rgba(255,255,255,0.7);text-align:center;font-size:0.85rem;margin-top:0.75rem;">Document ko frame mein rakhke photo lo</p>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Doc<span>Samajh</span></div>
+  <div class="nav-right">
+    <span class="nav-credits" id="navCredits">3 free docs left</span>
+    <button class="btn-primary" onclick="document.querySelector('.tool-section').scrollIntoView({behavior:'smooth'})">Try Free</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🇮🇳 Made for India &nbsp;·&nbsp; Hindi + Marathi + Tamil + More</div>
+  <h1>Koi bhi document,<br><em>seedhi baat</em></h1>
+  <p>Upload any Indian government notice, legal document, or bank letter — get a plain-language explanation in your language within seconds. No lawyer needed.</p>
+  <div class="trust-strip">
+    <span>📄 Tax notices</span>
+    <span>⚖️ Court summons</span>
+    <span>🏦 Loan documents</span>
+    <span>🏠 Rent agreements</span>
+    <span>💼 Job offers</span>
+  </div>
+</section>
+
+<!-- TOOL -->
+<section class="tool-section">
+  <h2>Apna document analyze karo</h2>
+  <p class="section-sub" id="toolSubtext">Pehli baar free — koi credit card nahi chahiye</p>
+
+  <!-- LANGUAGE TABS -->
+  <div style="margin-bottom:1.25rem;">
+    <div style="font-size:0.8rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Jawab ki bhasha</div>
+    <div class="lang-tabs">
+      <div class="lang-tab active" onclick="setLang('hindi',this)">हिंदी</div>
+      <div class="lang-tab" onclick="setLang('english',this)">English</div>
+      <div class="lang-tab" onclick="setLang('hinglish',this)">Hinglish</div>
+      <div class="lang-tab" onclick="setLang('marathi',this)">मराठी</div>
+      <div class="lang-tab" onclick="setLang('tamil',this)">தமிழ்</div>
+      <div class="lang-tab" onclick="setLang('gujarati',this)">ગુજરાતી</div>
+    </div>
+  </div>
+
+  <!-- UPLOAD OPTIONS -->
+  <div class="upload-grid">
+    <div class="upload-card" id="cameraCard" onclick="openCamera()">
+      <div class="upload-icon">📸</div>
+      <h3>Camera se photo lo</h3>
+      <p>Abhi seedha photo khicho</p>
+    </div>
+    <div class="upload-card" id="uploadCard">
+      <input type="file" id="fileInput" accept=".pdf,.txt,.png,.jpg,.jpeg" onchange="handleFile(event)">
+      <div class="upload-icon">📁</div>
+      <h3 id="uploadTitle">File upload karo</h3>
+      <p>PDF, image, ya text file</p>
+    </div>
+  </div>
+
+  <!-- IMAGE PREVIEW -->
+  <div id="imagePreview" style="display:none;margin-bottom:1rem;text-align:center;">
+    <img id="previewImg" class="preview-img"/>
+    <button onclick="clearImage()" style="padding:4px 14px;border:1px solid var(--border);border-radius:6px;background:white;font-size:0.82rem;cursor:pointer;">✕ Remove</button>
+  </div>
+
+  <div class="or-divider">ya text paste karo</div>
+
+  <textarea class="paste-area" id="pasteArea" placeholder="Yahan koi bhi notice, agreement, ya letter ka text paste karo..."></textarea>
+
+  <div class="selector-group">
+    <label>Document type</label>
+    <select id="docType">
+      <option value="auto">Auto detect</option>
+      <option value="tax">Income Tax Notice</option>
+      <option value="court">Court / Legal Notice</option>
+      <option value="loan">Loan / Bank Letter</option>
+      <option value="rent">Rent Agreement</option>
+      <option value="job">Job Offer Letter</option>
+      <option value="govt">Government Notice</option>
+      <option value="gst">GST Notice</option>
+    </select>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <button class="analyze-btn" id="analyzeBtn" onclick="analyzeDoc()">
+    <span>⚡</span> Document Samjhao
+  </button>
+
+  <div class="loading-state" id="loadingState">
+    <div class="spinner"></div>
+    <p id="loadingText">Aapka document padh raha hoon...</p>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <div class="result-header-left">
+        ✅ <span>Document samajh aaya</span>
+        <span class="doc-type-badge" id="detectedType">Document</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <div id="urgencyChip"></div>
+        <div class="result-actions">
+          <button class="action-btn" onclick="downloadSummary()">⬇ Download</button>
+          <button class="action-btn primary" onclick="showReplyGenerator()">✍ Reply Draft</button>
+        </div>
+      </div>
+    </div>
+    <div class="result-body">
+      <div class="result-section">
+        <h4>📋 Ye document kya hai?</h4>
+        <p id="whatIsIt"></p>
+      </div>
+      <div class="result-section">
+        <h4>⚠️ Dhyan dene wali baatein</h4>
+        <p id="keyPoints"></p>
+      </div>
+      <div class="result-section">
+        <h4>✅ Kya karna hai — step by step</h4>
+        <ol class="action-steps" id="actionSteps"></ol>
+      </div>
+      <div class="result-section">
+        <h4>⏰ Deadline / Time limit</h4>
+        <p id="deadline"></p>
+      </div>
+      <div class="result-section">
+        <h4>🔑 Important terms (simple mein)</h4>
+        <p id="terms"></p>
+      </div>
+      <!-- REPLY GENERATOR -->
+      <div class="reply-section" id="replySection">
+        <h4>✍ AI-Generated Reply Draft</h4>
+        <div class="loading-state" id="replyLoading" style="padding:1rem;">
+          <div class="spinner"></div>
+          <p>Reply draft bana raha hoon...</p>
+        </div>
+        <textarea class="reply-textarea" id="replyText" style="display:none;" placeholder="Reply yahan aayega..."></textarea>
+        <div class="reply-actions" id="replyActions" style="display:none;">
+          <button class="action-btn primary" onclick="copyReply()">📋 Copy Reply</button>
+          <button class="action-btn" onclick="showReplyGenerator()">🔄 Regenerate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section">
+  <div class="pricing-inner">
+    <h2>Simple pricing</h2>
+    <p style="color:var(--muted);font-size:0.95rem;margin-top:0.5rem;">Koi hidden charges nahi. Cancel anytime.</p>
+    <div class="pricing-cards">
+      <div class="pricing-card">
+        <div style="font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:0.5rem;">Free</div>
+        <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;">₹0</div>
+        <div style="font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;">hamesha ke liye</div>
+        <ul class="plan-features2"><li>3 documents/month</li><li>Hindi + English</li><li>Basic explanation</li></ul>
+        <button class="plan-btn2" onclick="document.querySelector('.tool-section').scrollIntoView({behavior:'smooth'})">Start Free</button>
+      </div>
+      <div class="pricing-card popular">
+        <div class="popular-tag">SABSE POPULAR</div>
+        <div style="font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:0.5rem;">Pro</div>
+        <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;">₹299</div>
+        <div style="font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;">per month</div>
+        <ul class="plan-features2"><li>Unlimited documents</li><li>All 6 Indian languages</li><li>Reply generator</li><li>Camera capture</li><li>Download summary</li></ul>
+        <button class="plan-btn2 filled">Upgrade — Coming Soon</button>
+      </div>
+      <div class="pricing-card">
+        <div style="font-size:0.85rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-bottom:0.5rem;">Business</div>
+        <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;">₹2,999</div>
+        <div style="font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;">per month</div>
+        <ul class="plan-features2"><li>Unlimited documents</li><li>10 team members</li><li>API access</li><li>White-label option</li></ul>
+        <button class="plan-btn2">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<p class="footer-note">⚠️ DocSamajh provides plain-language explanations for general understanding only. This is not legal advice.</p>
+<footer>
+  <div>© 2026 DocSamajh. All rights reserved.</div>
+  <div style="display:flex;gap:1.5rem;">
+    <a href="#" style="color:var(--muted);text-decoration:none;">Privacy</a>
+    <a href="#" style="color:var(--muted);text-decoration:none;">Terms</a>
+  </div>
+</footer>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+var BACKEND_URL = 'https://docsamajh-backend-production.up.railway.app';
+var FREE_LIMIT = 3;
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var extractedText = '';
+var selectedLang = 'hindi';
+var lastResult = null;
+var cameraStream = null;
+
+// ── USAGE TRACKING (localStorage) ─────────────────────────────────────────────
+function getUsageCount() {
+  return parseInt(localStorage.getItem('ds_usage') || '0');
+}
+function incrementUsage() {
+  localStorage.setItem('ds_usage', getUsageCount() + 1);
+  updateCreditsDisplay();
+}
+function updateCreditsDisplay() {
+  var used = getUsageCount();
+  var left = Math.max(0, FREE_LIMIT - used);
+  var el = document.getElementById('navCredits');
+  if (left > 0) {
+    el.textContent = left + ' free docs left';
+    el.style.background = 'var(--saffron-light)';
+    el.style.color = 'var(--saffron)';
+  } else {
+    el.textContent = 'Free limit reached';
+    el.style.background = '#FEE2E2';
+    el.style.color = '#991B1B';
+  }
+}
+updateCreditsDisplay();
+
+// ── LANGUAGE ──────────────────────────────────────────────────────────────────
+function setLang(lang, el) {
+  selectedLang = lang;
+  document.querySelectorAll('.lang-tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────────────────────
+function handleFile(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var uploadTitle = document.getElementById('uploadTitle');
+  var uploadCard = document.getElementById('uploadCard');
+
+  if (file.type === 'text/plain') {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      extractedText = e.target.result;
+      uploadTitle.textContent = '✅ ' + file.name;
+      uploadCard.classList.add('has-file');
+    };
+    reader.readAsText(file);
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    extractedText = e.target.result;
+    uploadTitle.textContent = '✅ ' + file.name;
+    uploadCard.classList.add('has-file');
+    document.getElementById('pasteArea').value = '';
+    // Show preview for images
+    if (file.type.startsWith('image/')) {
+      document.getElementById('previewImg').src = e.target.result;
+      document.getElementById('imagePreview').style.display = 'block';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  extractedText = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('previewImg').src = '';
+  document.getElementById('uploadTitle').textContent = 'File upload karo';
+  document.getElementById('uploadCard').classList.remove('has-file');
+  document.getElementById('pasteArea').value = '';
+}
+
+// ── CAMERA ────────────────────────────────────────────────────────────────────
+function openCamera() {
+  // On mobile — use input capture as primary (most reliable)
+  var isMobile = /Android|iPhone|iPad/i.test(navigator.userAgent);
+  if (isMobile) {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.capture = 'environment';
+    input.onchange = handleFile;
+    input.click();
+    return;
+  }
+  // On desktop — use webcam
+  document.getElementById('cameraModal').classList.add('open');
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(function(stream) {
+      cameraStream = stream;
+      document.getElementById('cameraFeed').srcObject = stream;
+    })
+    .catch(function() {
+      closeCamera();
+      alert('Camera access nahi mila. File upload use karo.');
+    });
+}
+
+function capturePhoto() {
+  var video = document.getElementById('cameraFeed');
+  var canvas = document.getElementById('cameraCanvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+  extractedText = dataUrl;
+  document.getElementById('previewImg').src = dataUrl;
+  document.getElementById('imagePreview').style.display = 'block';
+  document.getElementById('uploadTitle').textContent = '✅ Camera photo';
+  document.getElementById('uploadCard').classList.add('has-file');
+  closeCamera();
+}
+
+function closeCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(function(t){t.stop();}); cameraStream = null; }
+  document.getElementById('cameraModal').classList.remove('open');
+}
+
+document.getElementById('captureBtn').onclick = capturePhoto;
+document.getElementById('closeCameraBtn').onclick = closeCamera;
+
+// ── MAIN ANALYZE ──────────────────────────────────────────────────────────────
+function analyzeDoc() {
+  var pasteText = document.getElementById('pasteArea').value.trim();
+  var docType = document.getElementById('docType').value;
+
+  if (!pasteText && !extractedText) { showError('Koi document upload karo ya text paste karo.'); return; }
+
+  // Check free limit
+  if (getUsageCount() >= FREE_LIMIT) {
+    showError('Free limit khatam ho gayi. Pro plan ke liye neeche dekho — ₹299/month sirf.');
+    return;
+  }
+
+  hideError();
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('loadingText').textContent = 'Aapka document padh raha hoon...';
+  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('replySection').style.display = 'none';
+  document.getElementById('analyzeBtn').disabled = true;
+
+  var fileBase64 = null, fileType = null;
+  if (extractedText && extractedText.startsWith('data:')) {
+    fileType = extractedText.split(';')[0].split(':')[1];
+    fileBase64 = extractedText.split(',')[1];
+  }
+
+  fetch(BACKEND_URL + '/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: pasteText, fileBase64: fileBase64, fileType: fileType, language: selectedLang, docType: docType })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('analyzeBtn').disabled = false;
+    if (!data.success) { showError('Error: ' + data.error); return; }
+    lastResult = data.result;
+    displayResult(data.result);
+    incrementUsage();
+  })
+  .catch(function(err) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('analyzeBtn').disabled = false;
+    showError('Network error. Check internet connection aur dobara try karo.');
+  });
+}
+
+function displayResult(r) {
+  document.getElementById('detectedType').textContent = r.docType || 'Document';
+  var urgencyMap = {
+    high: { cls:'urgency-high', text:'🔴 Urgent — Turant karo' },
+    medium: { cls:'urgency-medium', text:'🟡 Medium — Dhyan rakhna' },
+    low: { cls:'urgency-low', text:'🟢 Low urgency' }
+  };
+  var u = urgencyMap[r.urgency] || urgencyMap.low;
+  document.getElementById('urgencyChip').innerHTML = '<span class="urgency-chip ' + u.cls + '">' + u.text + '</span>';
+  document.getElementById('whatIsIt').textContent = r.whatIsIt || '';
+  document.getElementById('keyPoints').textContent = r.keyPoints || '';
+  document.getElementById('deadline').textContent = r.deadline || '';
+  document.getElementById('terms').textContent = r.terms || '';
+  var stepsEl = document.getElementById('actionSteps');
+  stepsEl.innerHTML = '';
+  (r.actionSteps || []).forEach(function(step, i) {
+    var li = document.createElement('li');
+    li.innerHTML = '<span class="step-num">' + (i+1) + '</span><span>' + step + '</span>';
+    stepsEl.appendChild(li);
+  });
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('resultCard').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ── REPLY GENERATOR ───────────────────────────────────────────────────────────
+function showReplyGenerator() {
+  if (!lastResult) return;
+  var replySection = document.getElementById('replySection');
+  var replyLoading = document.getElementById('replyLoading');
+  var replyText = document.getElementById('replyText');
+  var replyActions = document.getElementById('replyActions');
+
+  replySection.style.display = 'block';
+  replyLoading.style.display = 'block';
+  replyText.style.display = 'none';
+  replyActions.style.display = 'none';
+  replySection.scrollIntoView({ behavior:'smooth' });
+
+  fetch(BACKEND_URL + '/generate-reply', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ analysis: lastResult, language: selectedLang, tone: 'formal' })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    replyLoading.style.display = 'none';
+    replyText.style.display = 'block';
+    replyActions.style.display = 'flex';
+    replyText.value = data.reply || 'Reply generate nahi ho saka.';
+  })
+  .catch(function() {
+    replyLoading.style.display = 'none';
+    replyText.style.display = 'block';
+    replyText.value = 'Error. Dobara try karo.';
+  });
+}
+
+function copyReply() {
+  var text = document.getElementById('replyText').value;
+  navigator.clipboard.writeText(text).then(function() {
+    var btn = event.target;
+    btn.textContent = '✅ Copied!';
+    setTimeout(function() { btn.textContent = '📋 Copy Reply'; }, 2000);
+  });
+}
+
+// ── DOWNLOAD SUMMARY ──────────────────────────────────────────────────────────
+function downloadSummary() {
+  if (!lastResult) return;
+  var content = 'DocSamajh Analysis\n==================\n\n';
+  content += 'Document: ' + lastResult.docType + '\n';
+  content += 'Urgency: ' + lastResult.urgency + '\n\n';
+  content += 'KYA HAI:\n' + lastResult.whatIsIt + '\n\n';
+  content += 'DHYAN DO:\n' + lastResult.keyPoints + '\n\n';
+  content += 'KARNA KYA HAI:\n';
+  (lastResult.actionSteps||[]).forEach(function(s,i){ content += (i+1)+'. '+s+'\n'; });
+  content += '\nDEADLINE:\n' + lastResult.deadline + '\n\n';
+  content += 'TERMS:\n' + lastResult.terms + '\n\n';
+  content += '--\nDocSamajh.vercel.app\nThis is not legal advice.';
+  var blob = new Blob([content], {type:'text/plain'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = 'DocSamajh_Analysis.txt'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function showError(msg) {
+  var el = document.getElementById('errorMsg');
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideError() {
+  document.getElementById('errorMsg').style.display = 'none';
+}
+</script>
+</body>
+</html>
